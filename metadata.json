@@ -1,0 +1,6 @@
+{
+  "name": "Tanya AI Interviewer",
+  "description": "Production-ready AI interview platform featuring Tanya: HR, Technical, Resume-based & DSA interviews with voice, Monaco code execution, resume ATS analysis, and Razorpay subscriptions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
