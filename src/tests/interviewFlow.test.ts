@@ -45,5 +45,18 @@ export async function runInterviewFlowTests(): Promise<{ passed: boolean; messag
 
   console.log(`✓ Report card generated successfully: Score ${report.overallScore}/100, Verdict: ${report.recommendation}`);
 
-  return { passed: true, message: 'Interview lifecycle & report tests passed!' };
+  // 3. Test Session Ownership & Resume Storage assertions
+  const session = dbStore.getSessionById('session_demo_completed');
+  if (session && session.userId !== 'user_candidate_1') {
+    throw new Error('Session ownership mismatch in test seed record');
+  }
+  console.log('✓ Session ownership verified for candidate Alex Mercer.');
+
+  const resumes = dbStore.getUserResumes('user_candidate_1');
+  if (resumes.length > 0 && !resumes[0].sourceType) {
+    throw new Error('Resume record missing explicit sourceType');
+  }
+  console.log(`✓ Resume record validated with explicit sourceType: "${resumes[0]?.sourceType}".`);
+
+  return { passed: true, message: 'Interview lifecycle, ownership & report tests passed!' };
 }

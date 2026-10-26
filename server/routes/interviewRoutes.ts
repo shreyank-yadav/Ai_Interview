@@ -183,19 +183,52 @@ router.post('/create', (req: Request, res: Response): any => {
 });
 
 // GET /api/interviews/:id
+// Issue 4: Ownership checks
 router.get('/:id', (req: Request, res: Response): any => {
+  const userId = extractUserIdFromHeader(req);
+  if (!userId) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const user = dbStore.findUserById(userId);
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
   const session = dbStore.getSessionById(req.params.id);
   if (!session) {
     return res.status(404).json({ error: 'Interview session not found' });
   }
+
+  // Ownership check
+  if (session.userId !== userId && user.role !== 'admin') {
+    return res.status(403).json({ error: 'Access denied: You do not have permission to access this interview session.' });
+  }
+
   return res.json({ session });
 });
 
 // POST /api/interviews/:id/answer
+// Issue 4: Ownership checks
 router.post('/:id/answer', async (req: Request, res: Response): Promise<any> => {
+  const userId = extractUserIdFromHeader(req);
+  if (!userId) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const user = dbStore.findUserById(userId);
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
   const session = dbStore.getSessionById(req.params.id);
   if (!session) {
     return res.status(404).json({ error: 'Interview session not found' });
+  }
+
+  // Ownership check
+  if (session.userId !== userId && user.role !== 'admin') {
+    return res.status(403).json({ error: 'Access denied: You do not have permission to answer this interview session.' });
   }
 
   if (session.status === 'completed') {
@@ -267,10 +300,26 @@ router.post('/:id/answer', async (req: Request, res: Response): Promise<any> => 
 });
 
 // POST /api/interviews/:id/finish
+// Issue 4: Ownership checks
 router.post('/:id/finish', async (req: Request, res: Response): Promise<any> => {
+  const userId = extractUserIdFromHeader(req);
+  if (!userId) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const user = dbStore.findUserById(userId);
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
   const session = dbStore.getSessionById(req.params.id);
   if (!session) {
     return res.status(404).json({ error: 'Interview session not found' });
+  }
+
+  // Ownership check
+  if (session.userId !== userId && user.role !== 'admin') {
+    return res.status(403).json({ error: 'Access denied: You do not have permission to finalize this interview session.' });
   }
 
   // Extract Q&A pairs

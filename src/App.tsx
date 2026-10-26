@@ -50,7 +50,7 @@ function MainApp() {
         <div className="flex flex-col items-center gap-3">
           <div className="h-9 w-9 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
           <p className="text-xs font-semibold tracking-wider uppercase text-slate-400">
-            Initializing Tanya AI Interview Platform...
+            Initializing PrepNova Interview Platform...
           </p>
         </div>
       </div>
@@ -110,7 +110,7 @@ function MainApp() {
       <footer className="border-t border-slate-900 bg-slate-950/90 py-6 text-center text-xs text-slate-500">
         <div className="mx-auto max-w-7xl px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p>
-            &copy; {new Date().getFullYear()} Tanya AI Interviewer SaaS. Production-ready interview engineering.
+            &copy; {new Date().getFullYear()} PrepNova. AI-Powered Interview Preparation Platform.
           </p>
           <div className="flex items-center gap-4 text-[11px] text-slate-400">
             <span>Server-side Gemini 3.8 Flash & TTS</span>

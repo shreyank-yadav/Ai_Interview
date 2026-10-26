@@ -1,8 +1,8 @@
-# System Architecture — Tanya AI Interviewer
+# System Architecture — PrepNova
 
 ## 1. System Overview
 
-Tanya AI Interviewer is an enterprise-grade AI mock interview SaaS platform engineered with a strict full-stack separation of concerns.
+PrepNova is an AI-powered interview preparation platform featuring Tanya as the personal AI interviewer, engineered with a strict full-stack separation of concerns.
 
 ```mermaid
 graph TD

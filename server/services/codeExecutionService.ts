@@ -4,7 +4,7 @@
  */
 
 import vm from 'vm';
-import { ai } from './geminiService.ts';
+import { ai, DEFAULT_MODEL } from './geminiService.ts';
 
 export interface CodeExecutionRequest {
   language: 'javascript' | 'typescript' | 'python' | 'cpp' | 'java';
@@ -249,13 +249,21 @@ Provide:
 5. Top 1-2 potential bugs or boundary weaknesses.
 6. A 1-2 sentence spoken feedback as Tanya the AI interviewer.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+    const geminiCall = ai.models.generateContent({
+      model: DEFAULT_MODEL,
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
       },
     });
+
+    // 3.5s timeout guard against network hangs
+    const timeoutPromise = new Promise<null>(resolve => setTimeout(() => resolve(null), 3500));
+    const response: any = await Promise.race([geminiCall, timeoutPromise]);
+
+    if (!response || !response.text) {
+      throw new Error('Gemini API review timed out, falling back to heuristic review.');
+    }
 
     const parsed = JSON.parse(response.text || '{}');
     return {

@@ -179,7 +179,7 @@ export const MonacoEditorPanel: React.FC<MonacoEditorPanelProps> = ({
                 }`}
               >
                 <Sparkles className="h-3.5 w-3.5 text-purple-400" />
-                Tanya AI Code Review
+                Tanya's Code Review
               </button>
             )}
           </div>

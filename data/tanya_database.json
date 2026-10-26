@@ -36,6 +36,112 @@
   ],
   "sessions": [
     {
+      "id": "session_1793007078507_v1pn",
+      "userId": "user_admin_1",
+      "type": "technical",
+      "roleTarget": "Senior Full-Stack Engineer",
+      "difficulty": "senior",
+      "status": "in_progress",
+      "startedAt": "2026-10-26T09:31:18.507Z",
+      "messages": [
+        {
+          "id": "msg_init_1793007078507",
+          "sender": "tanya",
+          "text": "Hello! I am Tanya, your AI interviewer today. I'll be assessing your technical depth, problem-solving structure, and communication. Take a breath, speak clearly, and let's get started whenever you're ready. We'll be conducting a senior-level TECHNICAL interview for the Senior Full-Stack Engineer role. First question: How would you design a distributed rate limiter that handles 100,000 requests per second across multiple regional data centers?",
+          "timestamp": "2026-10-26T09:31:18.507Z"
+        }
+      ],
+      "currentQuestionIndex": 0,
+      "totalQuestions": 3,
+      "questions": [
+        {
+          "id": "q_1",
+          "text": "How would you design a distributed rate limiter that handles 100,000 requests per second across multiple regional data centers?",
+          "category": "System Design & Distributed Scalability",
+          "expectedKeyPoints": [
+            "Token bucket / Leaky bucket algorithm",
+            "Redis or Memcached caching",
+            "Sliding window log",
+            "Race condition mitigation"
+          ]
+        },
+        {
+          "id": "q_2",
+          "text": "What are the trade-offs between SQL (e.g., PostgreSQL) and NoSQL (e.g., DynamoDB/MongoDB) when designing an e-commerce order ledger?",
+          "category": "Data Modeling & Concurrency",
+          "expectedKeyPoints": [
+            "ACID transactions",
+            "CAP theorem trade-offs",
+            "Schema evolution",
+            "Eventual consistency vs strong consistency"
+          ]
+        },
+        {
+          "id": "q_3",
+          "text": "How do you identify, measure, and optimize memory leaks and event-loop lag in a high-concurrency Node.js or Go microservice?",
+          "category": "Performance Tuning & Diagnostics",
+          "expectedKeyPoints": [
+            "Profiling tools (heap snapshots, flame graphs)",
+            "Garbage collection behavior",
+            "Async resource leak tracking"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session_1793007076147_8r2u",
+      "userId": "user_admin_1",
+      "type": "technical",
+      "roleTarget": "Senior Full-Stack Engineer",
+      "difficulty": "senior",
+      "status": "in_progress",
+      "startedAt": "2026-10-26T09:31:16.147Z",
+      "messages": [
+        {
+          "id": "msg_init_1793007076147",
+          "sender": "tanya",
+          "text": "Hello! I am Tanya, your AI interviewer today. I'll be assessing your technical depth, problem-solving structure, and communication. Take a breath, speak clearly, and let's get started whenever you're ready. We'll be conducting a senior-level TECHNICAL interview for the Senior Full-Stack Engineer role. First question: How would you design a distributed rate limiter that handles 100,000 requests per second across multiple regional data centers?",
+          "timestamp": "2026-10-26T09:31:16.147Z"
+        }
+      ],
+      "currentQuestionIndex": 0,
+      "totalQuestions": 3,
+      "questions": [
+        {
+          "id": "q_1",
+          "text": "How would you design a distributed rate limiter that handles 100,000 requests per second across multiple regional data centers?",
+          "category": "System Design & Distributed Scalability",
+          "expectedKeyPoints": [
+            "Token bucket / Leaky bucket algorithm",
+            "Redis or Memcached caching",
+            "Sliding window log",
+            "Race condition mitigation"
+          ]
+        },
+        {
+          "id": "q_2",
+          "text": "What are the trade-offs between SQL (e.g., PostgreSQL) and NoSQL (e.g., DynamoDB/MongoDB) when designing an e-commerce order ledger?",
+          "category": "Data Modeling & Concurrency",
+          "expectedKeyPoints": [
+            "ACID transactions",
+            "CAP theorem trade-offs",
+            "Schema evolution",
+            "Eventual consistency vs strong consistency"
+          ]
+        },
+        {
+          "id": "q_3",
+          "text": "How do you identify, measure, and optimize memory leaks and event-loop lag in a high-concurrency Node.js or Go microservice?",
+          "category": "Performance Tuning & Diagnostics",
+          "expectedKeyPoints": [
+            "Profiling tools (heap snapshots, flame graphs)",
+            "Garbage collection behavior",
+            "Async resource leak tracking"
+          ]
+        }
+      ]
+    },
+    {
       "id": "session_demo_completed",
       "userId": "user_candidate_1",
       "type": "technical",
@@ -227,7 +333,8 @@
         "Walk Tanya through your decision matrix when choosing between Go microservices and Node.js for high-concurrency workloads.",
         "Describe a situation where a frontend micro-frontend deployed an incompatible breaking API change and how you mitigated customer downtime."
       ],
-      "rawTextPreview": "Alex Mercer | Senior Full-Stack Engineer | alex.mercer@gmail.com | github.com/alexmercer ..."
+      "rawTextPreview": "Alex Mercer | Senior Full-Stack Engineer | alex.mercer@gmail.com | github.com/alexmercer ...",
+      "sourceType": "pasted_text"
     }
   ],
   "problems": [
@@ -383,6 +490,54 @@
       "currency": "INR",
       "status": "paid",
       "tier": "premium",
+      "createdAt": "2026-10-26T09:31:20.879Z",
+      "razorpayPaymentId": "pay_test_87654321",
+      "razorpaySignature": "b2d4867ebf54a76d9c3371e5080f4ddb3fe00ac8f4afbb38a1f1e571dce17cf7"
+    },
+    {
+      "id": "pay_test_rec_1",
+      "orderId": "order_test_12345678",
+      "userId": "user_candidate_1",
+      "amount": 149900,
+      "currency": "INR",
+      "status": "paid",
+      "tier": "premium",
+      "createdAt": "2026-10-26T09:22:06.252Z",
+      "razorpayPaymentId": "pay_test_87654321",
+      "razorpaySignature": "b2d4867ebf54a76d9c3371e5080f4ddb3fe00ac8f4afbb38a1f1e571dce17cf7"
+    },
+    {
+      "id": "pay_test_rec_1",
+      "orderId": "order_test_12345678",
+      "userId": "user_candidate_1",
+      "amount": 149900,
+      "currency": "INR",
+      "status": "paid",
+      "tier": "premium",
+      "createdAt": "2026-10-26T09:21:23.265Z",
+      "razorpayPaymentId": "pay_test_87654321",
+      "razorpaySignature": "b2d4867ebf54a76d9c3371e5080f4ddb3fe00ac8f4afbb38a1f1e571dce17cf7"
+    },
+    {
+      "id": "pay_test_rec_1",
+      "orderId": "order_test_12345678",
+      "userId": "user_candidate_1",
+      "amount": 149900,
+      "currency": "INR",
+      "status": "paid",
+      "tier": "premium",
+      "createdAt": "2026-10-26T09:18:39.164Z",
+      "razorpayPaymentId": "pay_test_87654321",
+      "razorpaySignature": "b2d4867ebf54a76d9c3371e5080f4ddb3fe00ac8f4afbb38a1f1e571dce17cf7"
+    },
+    {
+      "id": "pay_test_rec_1",
+      "orderId": "order_test_12345678",
+      "userId": "user_candidate_1",
+      "amount": 149900,
+      "currency": "INR",
+      "status": "paid",
+      "tier": "premium",
       "createdAt": "2026-10-26T07:26:27.862Z",
       "razorpayPaymentId": "pay_test_87654321",
       "razorpaySignature": "b2d4867ebf54a76d9c3371e5080f4ddb3fe00ac8f4afbb38a1f1e571dce17cf7"
@@ -401,6 +556,76 @@
     }
   ],
   "auditLogs": [
+    {
+      "id": "log_1793007080882_0rgjx",
+      "timestamp": "2026-10-26T09:31:20.882Z",
+      "action": "SUBSCRIPTION_UPGRADED",
+      "actorEmail": "candidate@tanya-ai.com",
+      "details": "Upgraded to premium tier via Razorpay Order order_test_12345678"
+    },
+    {
+      "id": "log_1793007080880_271zg",
+      "timestamp": "2026-10-26T09:31:20.880Z",
+      "action": "PAYMENT_ORDER_CREATED",
+      "actorEmail": "user_candidate_1",
+      "details": "Order order_test_12345678 for 1499 INR"
+    },
+    {
+      "id": "log_1793007078507_vkdx9",
+      "timestamp": "2026-10-26T09:31:18.507Z",
+      "action": "INTERVIEW_STARTED",
+      "actorEmail": "user_admin_1",
+      "details": "Type: technical, Difficulty: senior"
+    },
+    {
+      "id": "log_1793007076148_v1ra8",
+      "timestamp": "2026-10-26T09:31:16.148Z",
+      "action": "INTERVIEW_STARTED",
+      "actorEmail": "user_admin_1",
+      "details": "Type: technical, Difficulty: senior"
+    },
+    {
+      "id": "log_1793006526254_itsho",
+      "timestamp": "2026-10-26T09:22:06.254Z",
+      "action": "SUBSCRIPTION_UPGRADED",
+      "actorEmail": "candidate@tanya-ai.com",
+      "details": "Upgraded to premium tier via Razorpay Order order_test_12345678"
+    },
+    {
+      "id": "log_1793006526252_6lzis",
+      "timestamp": "2026-10-26T09:22:06.252Z",
+      "action": "PAYMENT_ORDER_CREATED",
+      "actorEmail": "user_candidate_1",
+      "details": "Order order_test_12345678 for 1499 INR"
+    },
+    {
+      "id": "log_1793006483273_5iw80",
+      "timestamp": "2026-10-26T09:21:23.273Z",
+      "action": "SUBSCRIPTION_UPGRADED",
+      "actorEmail": "candidate@tanya-ai.com",
+      "details": "Upgraded to premium tier via Razorpay Order order_test_12345678"
+    },
+    {
+      "id": "log_1793006483266_q4389",
+      "timestamp": "2026-10-26T09:21:23.266Z",
+      "action": "PAYMENT_ORDER_CREATED",
+      "actorEmail": "user_candidate_1",
+      "details": "Order order_test_12345678 for 1499 INR"
+    },
+    {
+      "id": "log_1793006319166_15qqh",
+      "timestamp": "2026-10-26T09:18:39.166Z",
+      "action": "SUBSCRIPTION_UPGRADED",
+      "actorEmail": "candidate@tanya-ai.com",
+      "details": "Upgraded to premium tier via Razorpay Order order_test_12345678"
+    },
+    {
+      "id": "log_1793006319164_5blkh",
+      "timestamp": "2026-10-26T09:18:39.164Z",
+      "action": "PAYMENT_ORDER_CREATED",
+      "actorEmail": "user_candidate_1",
+      "details": "Order order_test_12345678 for 1499 INR"
+    },
     {
       "id": "log_1792999587865_e5iqd",
       "timestamp": "2026-10-26T07:26:27.865Z",

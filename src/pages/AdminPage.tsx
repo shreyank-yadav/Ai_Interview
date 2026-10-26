@@ -99,11 +99,11 @@ export const AdminPage: React.FC = () => {
               <ShieldAlert className="h-5 w-5" />
             </div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
-              Admin Governance & Tanya Tuner Hub
+              PrepNova Admin Governance & Tanya Tuner Hub
             </h1>
           </div>
           <p className="text-xs text-slate-400">
-            Monitor platform metrics, control candidate subscriptions, audit security actions, and customize Tanya's interviewer persona.
+            Monitor PrepNova platform metrics, control candidate subscriptions, audit security actions, and customize Tanya's interviewer persona.
           </p>
         </div>
 
@@ -277,7 +277,7 @@ export const AdminPage: React.FC = () => {
           <div>
             <h3 className="text-base font-bold text-white flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-indigo-400" />
-              Tanya AI Persona & Behavior Tuning
+              Tanya Persona & Behavior Tuning
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
               Configure interviewer tone, strictness, avatar image, and welcome prompt.

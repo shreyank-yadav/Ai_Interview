@@ -9,6 +9,12 @@ import { QuestionEvaluation, InterviewReport, TanyaPersonaConfig, ParsedResume }
 // Initialize Gemini Client strictly following the Gemini API Skill guidelines
 const apiKey = process.env.GEMINI_API_KEY || '';
 
+if (!apiKey) {
+  console.warn(
+    '[Gemini Service] Warning: GEMINI_API_KEY environment variable is not configured. Real-time AI reasoning, parsing, and TTS will utilize structured fallback handlers.'
+  );
+}
+
 export const ai = apiKey
   ? new GoogleGenAI({
       apiKey,
@@ -20,8 +26,19 @@ export const ai = apiKey
     })
   : null;
 
-const DEFAULT_MODEL = 'gemini-3.8-flash';
-const TTS_MODEL = 'gemini-3.8-flash-lite-tts';
+// Issue 6: Dynamic model environment variable reads with documented defaults
+export const DEFAULT_MODEL = (process.env.GEMINI_MODEL_TEXT && process.env.GEMINI_MODEL_TEXT.trim()) || 'gemini-3.8-flash';
+export const TTS_MODEL = (process.env.GEMINI_MODEL_TTS && process.env.GEMINI_MODEL_TTS.trim()) || 'gemini-3.8-flash-lite-tts';
+
+/**
+ * Timeout wrapper for remote Gemini API calls to ensure responsive fallbacks during network spikes
+ */
+async function callGeminiWithTimeout<T>(apiPromise: Promise<T>, timeoutMs: number = 4000): Promise<T> {
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error(`Gemini API call exceeded ${timeoutMs}ms timeout`)), timeoutMs)
+  );
+  return Promise.race([apiPromise, timeout]);
+}
 
 /**
  * Generate adaptive interview follow-up or next question based on candidate's answer
@@ -61,23 +78,25 @@ Analyze the depth, accuracy, and completeness of the answer. Provide:
 3. nextQuestion: the subsequent question (or drill-down probing question).`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: DEFAULT_MODEL,
-      contents: prompt,
-      config: {
-        systemInstruction,
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            acknowledgment: { type: Type.STRING },
-            quickFeedback: { type: Type.STRING },
-            nextQuestion: { type: Type.STRING },
+    const response = await callGeminiWithTimeout(
+      ai.models.generateContent({
+        model: DEFAULT_MODEL,
+        contents: prompt,
+        config: {
+          systemInstruction,
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              acknowledgment: { type: Type.STRING },
+              quickFeedback: { type: Type.STRING },
+              nextQuestion: { type: Type.STRING },
+            },
+            required: ['acknowledgment', 'quickFeedback', 'nextQuestion'],
           },
-          required: ['acknowledgment', 'quickFeedback', 'nextQuestion'],
         },
-      },
-    });
+      })
+    );
 
     const parsed = JSON.parse(response.text || '{}');
     return {
@@ -124,53 +143,55 @@ ${JSON.stringify(params.qaPairs, null, 2)}
 Provide a rigorous, unbiased assessment including overall score (0-100), hire recommendation ('Strong Hire', 'Hire', 'Lean Hire', 'No Hire'), 4 category scores (0-100 each), top 3 key strengths, top 2-3 growth areas, and individual evaluations for each question.`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: DEFAULT_MODEL,
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            overallScore: { type: Type.NUMBER },
-            recommendation: { type: Type.STRING },
-            summary: { type: Type.STRING },
-            categoryScores: {
-              type: Type.OBJECT,
-              properties: {
-                technicalAccuracy: { type: Type.NUMBER },
-                communicationClarity: { type: Type.NUMBER },
-                problemSolving: { type: Type.NUMBER },
-                culturalAlignment: { type: Type.NUMBER },
-              },
-              required: ['technicalAccuracy', 'communicationClarity', 'problemSolving', 'culturalAlignment'],
-            },
-            keyStrengths: { type: Type.ARRAY, items: { type: Type.STRING } },
-            growthAreas: { type: Type.ARRAY, items: { type: Type.STRING } },
-            questionEvaluations: {
-              type: Type.ARRAY,
-              items: {
+    const response = await callGeminiWithTimeout(
+      ai.models.generateContent({
+        model: DEFAULT_MODEL,
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              overallScore: { type: Type.NUMBER },
+              recommendation: { type: Type.STRING },
+              summary: { type: Type.STRING },
+              categoryScores: {
                 type: Type.OBJECT,
                 properties: {
-                  questionId: { type: Type.STRING },
-                  questionText: { type: Type.STRING },
-                  candidateAnswer: { type: Type.STRING },
-                  score: { type: Type.NUMBER },
-                  clarityScore: { type: Type.NUMBER },
-                  technicalAccuracyScore: { type: Type.NUMBER },
-                  depthScore: { type: Type.NUMBER },
-                  strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
-                  improvements: { type: Type.ARRAY, items: { type: Type.STRING } },
-                  idealAnswer: { type: Type.STRING },
+                  technicalAccuracy: { type: Type.NUMBER },
+                  communicationClarity: { type: Type.NUMBER },
+                  problemSolving: { type: Type.NUMBER },
+                  culturalAlignment: { type: Type.NUMBER },
                 },
-                required: ['questionText', 'candidateAnswer', 'score', 'idealAnswer'],
+                required: ['technicalAccuracy', 'communicationClarity', 'problemSolving', 'culturalAlignment'],
+              },
+              keyStrengths: { type: Type.ARRAY, items: { type: Type.STRING } },
+              growthAreas: { type: Type.ARRAY, items: { type: Type.STRING } },
+              questionEvaluations: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    questionId: { type: Type.STRING },
+                    questionText: { type: Type.STRING },
+                    candidateAnswer: { type: Type.STRING },
+                    score: { type: Type.NUMBER },
+                    clarityScore: { type: Type.NUMBER },
+                    technicalAccuracyScore: { type: Type.NUMBER },
+                    depthScore: { type: Type.NUMBER },
+                    strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    improvements: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    idealAnswer: { type: Type.STRING },
+                  },
+                  required: ['questionText', 'candidateAnswer', 'score', 'idealAnswer'],
+                },
               },
             },
+            required: ['overallScore', 'recommendation', 'summary', 'categoryScores', 'keyStrengths', 'growthAreas', 'questionEvaluations'],
           },
-          required: ['overallScore', 'recommendation', 'summary', 'categoryScores', 'keyStrengths', 'growthAreas', 'questionEvaluations'],
         },
-      },
-    });
+      })
+    );
 
     const parsed = JSON.parse(response.text || '{}');
     return {
@@ -209,7 +230,10 @@ Provide a rigorous, unbiased assessment including overall score (0-100), hire re
 /**
  * Parse resume text and extract structured ATS insights
  */
-export async function parseResumeWithGemini(resumeText: string, fileName: string): Promise<Omit<ParsedResume, 'id' | 'userId' | 'fileSize' | 'uploadedAt'>> {
+export async function parseResumeWithGemini(
+  resumeText: string,
+  fileName: string
+): Promise<Omit<ParsedResume, 'id' | 'userId' | 'fileSize' | 'uploadedAt' | 'sourceType' | 'storedFilePath'>> {
   if (!ai) {
     return getFallbackResumeAnalysis(resumeText, fileName);
   }

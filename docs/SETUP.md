@@ -1,6 +1,6 @@
 # Local Setup & Installation Guide
 
-This guide walks through cloning, configuring, and running Tanya AI Interviewer on your local environment.
+This guide walks through cloning, configuring, and running PrepNova on your local environment.
 
 ## 1. Prerequisites
 

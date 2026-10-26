@@ -77,13 +77,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             <Sparkles className="h-6 w-6" />
           </div>
           <h2 className="text-xl font-extrabold text-white tracking-tight">
-            {mode === 'login' && 'Sign in to Tanya AI'}
-            {mode === 'register' && 'Create your Candidate Account'}
+            {mode === 'login' && 'Sign in to PrepNova'}
+            {mode === 'register' && 'Create your PrepNova Account'}
             {mode === 'forgot' && 'Reset your Password'}
           </h2>
           <p className="mt-1 text-xs text-slate-400">
-            {mode === 'login' && 'Prepare with realistic AI interviews and personalized feedback.'}
-            {mode === 'register' && 'Get 3 free mock interviews with full AI scorecard evaluation.'}
+            {mode === 'login' && 'Prepare with Tanya through realistic AI interviews and personalized feedback.'}
+            {mode === 'register' && 'Practice with Tanya — 3 free mock interviews with full AI scorecard evaluation.'}
             {mode === 'forgot' && "Enter your email address and we'll send a recovery link."}
           </p>
         </div>

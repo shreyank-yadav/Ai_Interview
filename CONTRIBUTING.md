@@ -1,6 +1,6 @@
-# Contributing to Tanya AI Interviewer
+# Contributing to PrepNova
 
-We welcome contributions to Tanya AI Interviewer! Please follow these guidelines to ensure code quality and stability.
+We welcome contributions to PrepNova! Please follow these guidelines to ensure code quality and stability.
 
 ## Development Workflow
 

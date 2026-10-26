@@ -4,13 +4,13 @@
  */
 
 import crypto from 'crypto';
-import { verifyRazorpaySignature, processSuccessfulPayment } from '../../server/services/razorpayService.ts';
+import { verifyRazorpaySignature, processSuccessfulPayment, getRazorpayCredentials } from '../../server/services/razorpayService.ts';
 import { dbStore } from '../../server/db/store.ts';
 
 export async function runPaymentSignatureTests(): Promise<{ passed: boolean; message: string }> {
   console.log('--- Testing Razorpay HMAC SHA256 Signature Verification ---');
 
-  const testSecret = process.env.RAZORPAY_KEY_SECRET || 'tanya_rzp_test_secret_998877';
+  const { keySecret: testSecret } = getRazorpayCredentials();
   const orderId = 'order_test_12345678';
   const paymentId = 'pay_test_87654321';
 

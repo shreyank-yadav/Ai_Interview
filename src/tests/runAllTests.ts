@@ -6,13 +6,22 @@
 import { runPaymentSignatureTests } from './paymentSignature.test.ts';
 import { runCodeExecutionTests } from './codeExecution.test.ts';
 import { runInterviewFlowTests } from './interviewFlow.test.ts';
+import { runAuthSecurityTests } from './authSecurity.test.ts';
 
 async function main() {
   console.log('====================================================');
-  console.log('🚀 Running Tanya AI Interviewer Automated Test Suite');
+  console.log('🚀 Running PrepNova Automated Test Suite');
   console.log('====================================================\n');
 
   let failed = 0;
+
+  try {
+    const authRes = await runAuthSecurityTests();
+    console.log(`[PASS] ${authRes.message}\n`);
+  } catch (err: any) {
+    console.error(`[FAIL] Auth Security Test Failed:`, err.message, '\n');
+    failed++;
+  }
 
   try {
     const payRes = await runPaymentSignatureTests();

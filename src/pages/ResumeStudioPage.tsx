@@ -74,15 +74,26 @@ export const ResumeStudioPage: React.FC<ResumeStudioPageProps> = ({ onStartTailo
     }
   };
 
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [base64Content, setBase64Content] = useState<string | null>(null);
+
   const handleUploadAndParse = async () => {
     if (!resumeText.trim()) return;
     setIsUploading(true);
     setErrorMessage(null);
 
     try {
-      const res = await api.uploadResumeText(fileName, resumeText);
+      // Issue 7 & 8: Explicitly differentiate physical file upload from pasted text
+      const res = await api.uploadResume({
+        fileName: uploadedFile ? uploadedFile.name : (fileName || 'pasted_resume.txt'),
+        textContent: resumeText,
+        base64Content: base64Content || undefined,
+      });
       setResumes(prev => [res.resume, ...prev]);
       setSelectedResume(res.resume);
+      // Reset file picker after upload
+      setUploadedFile(null);
+      setBase64Content(null);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to parse resume with AI');
     } finally {
@@ -107,13 +118,23 @@ export const ResumeStudioPage: React.FC<ResumeStudioPageProps> = ({ onStartTailo
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setUploadedFile(file);
     setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = event => {
+
+    // Read base64 for server storage in STORAGE_DIR
+    const b64Reader = new FileReader();
+    b64Reader.onload = evt => {
+      setBase64Content(evt.target?.result as string);
+    };
+    b64Reader.readAsDataURL(file);
+
+    // Read text for preview and NLP analysis
+    const textReader = new FileReader();
+    textReader.onload = event => {
       const content = event.target?.result as string;
       setResumeText(content || '');
     };
-    reader.readAsText(file);
+    textReader.readAsText(file);
   };
 
   return (
@@ -194,7 +215,7 @@ export const ResumeStudioPage: React.FC<ResumeStudioPageProps> = ({ onStartTailo
               ) : (
                 <>
                   <Sparkles className="h-4 w-4" />
-                  Analyze with Tanya AI
+                  Analyze with Tanya
                 </>
               )}
             </button>
@@ -221,9 +242,13 @@ export const ResumeStudioPage: React.FC<ResumeStudioPageProps> = ({ onStartTailo
                       <FileText className="h-4 w-4 text-indigo-400 shrink-0" />
                       <div className="truncate">
                         <p className="text-xs font-semibold truncate">{r.fileName}</p>
-                        <p className="text-[10px] text-slate-500">
-                          ATS Score: {r.atsScore}% &middot; {r.experienceYears}y exp
-                        </p>
+                        <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                          <span>ATS Score: {r.atsScore}%</span>
+                          <span>&bull;</span>
+                          <span className={r.sourceType === 'file_upload' ? 'text-indigo-400 font-medium' : 'text-amber-400 font-medium'}>
+                            {r.sourceType === 'file_upload' ? 'Physical File' : 'Pasted Text'}
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <button
@@ -258,9 +283,22 @@ export const ResumeStudioPage: React.FC<ResumeStudioPageProps> = ({ onStartTailo
                       ATS Match Score
                     </span>
                     <h3 className="text-base font-bold text-white">{selectedResume.candidateName}</h3>
-                    <p className="text-xs text-slate-400">
-                      {selectedResume.experienceYears}+ years estimated professional experience
-                    </p>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      <span className="text-xs text-slate-400">
+                        {selectedResume.experienceYears}+ years estimated experience
+                      </span>
+                      <span className="text-slate-600">&bull;</span>
+                      {selectedResume.sourceType === 'file_upload' ? (
+                        <span className="inline-flex items-center gap-1 rounded bg-indigo-500/10 border border-indigo-500/30 px-2 py-0.5 text-[10px] font-semibold text-indigo-300">
+                          <FileText className="h-3 w-3" />
+                          Stored: {selectedResume.storedFilePath || selectedResume.fileName}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
+                          Pasted Text Analysis (No file uploaded)
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 

@@ -128,6 +128,8 @@ export interface ParsedResume {
   potentialGaps: string[];
   tailoredQuestions: string[];
   rawTextPreview: string;
+  sourceType: 'file_upload' | 'pasted_text';
+  storedFilePath?: string;
 }
 
 export interface TanyaPersonaConfig {

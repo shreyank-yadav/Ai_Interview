@@ -3,7 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import bcrypt from 'bcryptjs';
 import { CodingProblem, TanyaPersonaConfig, User, ParsedResume, InterviewSession } from './schema.ts';
+
+// Deterministic bcrypt hashes for default demo accounts (demo123, admin123)
+const DEMO_PASSWORD_HASH = bcrypt.hashSync('demo123', 10);
+const ADMIN_PASSWORD_HASH = bcrypt.hashSync('admin123', 10);
 
 export const SEED_USERS: User[] = [
   {
@@ -15,7 +20,7 @@ export const SEED_USERS: User[] = [
     interviewCreditsRemaining: 15,
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     createdAt: '2026-09-15T10:00:00Z',
-    passwordHash: 'demo123',
+    passwordHash: DEMO_PASSWORD_HASH,
   },
   {
     id: 'user_admin_1',
@@ -26,7 +31,7 @@ export const SEED_USERS: User[] = [
     interviewCreditsRemaining: 9999,
     avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
     createdAt: '2026-08-01T08:00:00Z',
-    passwordHash: 'admin123',
+    passwordHash: ADMIN_PASSWORD_HASH,
   },
   {
     id: 'user_free_1',
@@ -37,7 +42,7 @@ export const SEED_USERS: User[] = [
     interviewCreditsRemaining: 1,
     avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
     createdAt: '2026-10-01T14:30:00Z',
-    passwordHash: 'demo123',
+    passwordHash: DEMO_PASSWORD_HASH,
   }
 ];
 
@@ -491,7 +496,9 @@ export const SEED_RESUMES: ParsedResume[] = [
       'Walk Tanya through your decision matrix when choosing between Go microservices and Node.js for high-concurrency workloads.',
       'Describe a situation where a frontend micro-frontend deployed an incompatible breaking API change and how you mitigated customer downtime.'
     ],
-    rawTextPreview: 'Alex Mercer | Senior Full-Stack Engineer | alex.mercer@gmail.com | github.com/alexmercer ...'
+    rawTextPreview: 'Alex Mercer | Senior Full-Stack Engineer | alex.mercer@gmail.com | github.com/alexmercer ...',
+    sourceType: 'file_upload',
+    storedFilePath: './data/uploads/Alex_Mercer_FullStack_2026.pdf',
   }
 ];
 

@@ -119,6 +119,12 @@ export const api = {
 
   getResume: (id: string) => request<{ resume: ParsedResume }>(`/api/resumes/${id}`),
 
+  uploadResume: (params: { fileName: string; textContent?: string; base64Content?: string }) =>
+    request<{ resume: ParsedResume }>('/api/resumes/upload', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    }),
+
   uploadResumeText: (fileName: string, textContent: string) =>
     request<{ resume: ParsedResume }>('/api/resumes/upload', {
       method: 'POST',

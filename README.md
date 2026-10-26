@@ -1,13 +1,12 @@
-# Tanya AI Interviewer — Production AI Interview Preparation SaaS
+# PrepNova — AI-Powered Interview Preparation Platform
 
-[![CI](https://github.com/google-ai-studio/tanya-ai-interviewer/actions/workflows/ci.yml/badge.svg)](https://github.com/google-ai-studio/tanya-ai-interviewer)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.0-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19.0-61dafb)](https://react.dev/)
 [![Express](https://img.shields.io/badge/Express-4.21-lightgrey)](https://expressjs.com/)
 [![Gemini](https://img.shields.io/badge/Gemini_API-3.8_Flash-orange)](https://ai.google.dev/)
 
-**Tanya AI Interviewer** is a production-ready, full-stack AI mock interview preparation platform featuring Tanya, an intelligent interviewer powered by Google Gemini. Tanya conducts realistic technical, HR behavioral, resume-specific, and algorithmic coding interviews with real-time speech synthesis, live microphone transcription, Monaco code execution, and comprehensive scorecards.
+**PrepNova** is an AI-powered interview preparation platform featuring **Tanya**, your personal AI interviewer powered by Google Gemini. Tanya conducts realistic technical, HR behavioral, resume-specific, and algorithmic coding interviews with real-time speech synthesis, live microphone transcription, Monaco code execution, and comprehensive scorecards.
 
 ---
 
@@ -118,7 +117,7 @@ RAZORPAY_WEBHOOK_SECRET="YourWebhookSecretHere"
 
 # CLIENT-SIDE EXPOSED (Prefixed with VITE_)
 VITE_RAZORPAY_KEY_ID="rzp_test_YourTestKeyIdHere"
-VITE_APP_NAME="Tanya AI Interviewer"
+VITE_APP_NAME="PrepNova"
 ```
 
 ---

@@ -6,36 +6,29 @@
 import { Router, Request, Response } from 'express';
 import { dbStore } from '../db/store.ts';
 import { User } from '../db/schema.ts';
+import { hashPassword, verifyPassword, signToken, verifySignedToken } from '../utils/auth.ts';
 
 const router = Router();
-
-// Simple session token generator for demonstration and security without external session dependencies
-function generateToken(userId: string): string {
-  return Buffer.from(JSON.stringify({ userId, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 })).toString('base64');
-}
 
 export function extractUserIdFromHeader(req: Request): string | null {
   const authHeader = req.headers.authorization;
   if (!authHeader) return null;
-  const token = authHeader.replace(/^Bearer\s+/i, '');
-  try {
-    const decoded = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'));
-    if (decoded.exp && decoded.exp > Date.now()) {
-      return decoded.userId;
-    }
-  } catch {
-    // If not a base64 session token, check if it's a direct user ID (for demo ease)
-    const user = dbStore.findUserById(token);
-    if (user) return user.id;
-  }
-  return null;
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+  const verified = verifySignedToken(token);
+  return verified ? verified.userId : null;
 }
 
 // POST /api/auth/register
+// Issue 1: Prevent public signup from assigning the admin role.
+// Issue 3: Hash passwords with bcrypt.
 router.post('/register', (req: Request, res: Response): any => {
-  const { email, password, name, role } = req.body;
+  const { email, password, name } = req.body;
   if (!email || !password || !name) {
     return res.status(400).json({ error: 'Name, email, and password are required' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters' });
   }
 
   const existing = dbStore.findUserByEmail(email);
@@ -43,24 +36,28 @@ router.post('/register', (req: Request, res: Response): any => {
     return res.status(409).json({ error: 'An account with this email already exists' });
   }
 
+  // Security Hardening: Public registration ALWAYS defaults strictly to 'candidate'.
+  // Admin role can only be granted by existing administrators through admin management.
   const newUser: User = {
     id: `user_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
     email: email.trim().toLowerCase(),
     name: name.trim(),
-    role: role === 'admin' ? 'admin' : 'candidate',
+    role: 'candidate',
     subscriptionTier: 'free',
     interviewCreditsRemaining: 3, // 3 free credits on signup
     createdAt: new Date().toISOString(),
-    passwordHash: password, // In production use bcrypt
+    passwordHash: hashPassword(password),
   };
 
   dbStore.createUser(newUser);
-  const token = generateToken(newUser.id);
+  const token = signToken(newUser.id, newUser.role);
   const { passwordHash, ...safeUser } = newUser;
   return res.status(201).json({ user: safeUser, token });
 });
 
 // POST /api/auth/login
+// Issue 2: Cryptographically signed token.
+// Issue 3: Bcrypt verification.
 router.post('/login', (req: Request, res: Response): any => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -68,11 +65,17 @@ router.post('/login', (req: Request, res: Response): any => {
   }
 
   const user = dbStore.findUserByEmail(email);
-  if (!user || user.passwordHash !== password) {
+  if (!user || !verifyPassword(password, user.passwordHash)) {
     return res.status(401).json({ error: 'Invalid email or password' });
   }
 
-  const token = generateToken(user.id);
+  // Seamlessly upgrade legacy seed hashes to bcrypt
+  if (!user.passwordHash.startsWith('$2a$') && !user.passwordHash.startsWith('$2b$')) {
+    const upgraded = hashPassword(password);
+    dbStore.updateUser(user.id, { passwordHash: upgraded });
+  }
+
+  const token = signToken(user.id, user.role);
   const { passwordHash, ...safeUser } = user;
   return res.json({ user: safeUser, token });
 });
@@ -81,7 +84,7 @@ router.post('/login', (req: Request, res: Response): any => {
 router.get('/me', (req: Request, res: Response): any => {
   const userId = extractUserIdFromHeader(req);
   if (!userId) {
-    return res.status(401).json({ error: 'Authentication required' });
+    return res.status(401).json({ error: 'Authentication required or token expired' });
   }
 
   const user = dbStore.findUserById(userId);
@@ -100,13 +103,16 @@ router.post('/reset-password', (req: Request, res: Response): any => {
     return res.status(400).json({ error: 'Email and new password are required' });
   }
 
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters' });
+  }
+
   const user = dbStore.findUserByEmail(email);
   if (!user) {
-    // Return friendly message even if user doesn't exist for security
     return res.json({ message: 'If this email exists, password has been reset.' });
   }
 
-  dbStore.updateUser(user.id, { passwordHash: newPassword });
+  dbStore.updateUser(user.id, { passwordHash: hashPassword(newPassword) });
   dbStore.logAction('PASSWORD_RESET', user.email, 'User password was reset successfully');
   return res.json({ message: 'Password has been successfully updated.' });
 });
@@ -144,7 +150,7 @@ router.post('/demo-login', (req: Request, res: Response): any => {
     return res.status(404).json({ error: 'Demo user not found' });
   }
 
-  const token = generateToken(user.id);
+  const token = signToken(user.id, user.role);
   const { passwordHash, ...safeUser } = user;
   return res.json({ user: safeUser, token });
 });

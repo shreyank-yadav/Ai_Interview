@@ -37,7 +37,7 @@ async function startServer() {
   app.get('/api/health', (_req: Request, res: Response) => {
     res.json({
       status: 'healthy',
-      app: 'Tanya AI Interviewer',
+      app: 'PrepNova',
       time: new Date().toISOString(),
       version: '1.0.0',
     });
@@ -73,7 +73,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Tanya AI Interviewer Server running at http://0.0.0.0:${PORT}`);
+    console.log(`🚀 PrepNova Server running at http://0.0.0.0:${PORT}`);
   });
 }
 

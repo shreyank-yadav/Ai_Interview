@@ -69,7 +69,7 @@ export const ReportCardModal: React.FC<ReportCardModalProps> = ({
               <Award className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white">Tanya AI &mdash; Candidate Evaluation Report</h2>
+              <h2 className="text-base font-bold text-white">PrepNova &mdash; Candidate Evaluation Report</h2>
               <p className="text-xs text-slate-400">Official Performance Scorecard</p>
             </div>
           </div>
@@ -122,7 +122,7 @@ export const ReportCardModal: React.FC<ReportCardModalProps> = ({
             <div className="flex flex-col justify-center border-t md:border-t-0 md:border-l border-slate-800 pt-3 md:pt-0 md:pl-4">
               <span className="text-xs uppercase font-bold text-slate-400 tracking-wider mb-1">Generated At</span>
               <p className="text-xs text-slate-300">{new Date(report.generatedAt).toLocaleString()}</p>
-              <p className="text-[11px] text-slate-500 mt-1">Evaluated by Tanya AI Core Engine</p>
+              <p className="text-[11px] text-slate-500 mt-1">Interviewer: Tanya &bull; Evaluated by PrepNova Engine</p>
             </div>
           </div>
 

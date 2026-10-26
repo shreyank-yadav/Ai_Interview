@@ -53,12 +53,12 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, onOpenA
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-lg font-bold tracking-tight text-white">Tanya AI</span>
+                <span className="text-lg font-bold tracking-tight text-white">PrepNova</span>
                 <span className="rounded-md bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-400 border border-indigo-500/30">
                   {user?.subscriptionTier === 'premium' ? 'PREMIUM' : 'FREE'}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 font-medium">Production AI Interview Platform</p>
+              <p className="text-[11px] text-slate-400 font-medium">AI-Powered Interview Preparation Platform</p>
             </div>
           </button>
 

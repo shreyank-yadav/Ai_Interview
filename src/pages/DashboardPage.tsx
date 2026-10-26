@@ -107,13 +107,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onStartInterview, 
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-8">
-      {/* Welcome Banner */}
+      {/* Platform Branding & Welcome Banner */}
       <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-950 to-indigo-950/40 p-6 sm:p-8 shadow-2xl">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="rounded-md bg-indigo-500/20 border border-indigo-500/30 px-2 py-0.5 text-xs font-bold text-indigo-300">
-                AI INTERVIEW READINESS
+                PrepNova — AI-Powered Interview Preparation Platform
               </span>
               <span className="text-xs text-slate-400">&bull; Tanya Engine v2.4</span>
             </div>
@@ -121,7 +121,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onStartInterview, 
               Welcome back, {user?.name || 'Candidate'}!
             </h1>
             <p className="mt-1 text-sm text-slate-300 max-w-xl">
-              Ready for your next mock interview? Tanya is prepared to test your technical depth, coding skills, and behavioral storytelling.
+              Elevate your interview performance with PrepNova. Prepare with Tanya across technical depth, live coding challenges, and behavioral storytelling.
             </p>
           </div>
 
@@ -139,6 +139,57 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onStartInterview, 
             >
               <FileText className="h-4 w-4" />
               Upload Resume
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Meet Tanya — Your Personal AI Interviewer Section */}
+      <div className="relative overflow-hidden rounded-3xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-slate-900 to-slate-950 p-6 sm:p-8 shadow-2xl">
+        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left max-w-2xl">
+            {/* Tanya Avatar Portrait Frame */}
+            <div className="relative shrink-0">
+              <div className="h-24 w-24 sm:h-28 sm:w-28 rounded-2xl overflow-hidden ring-2 ring-indigo-500/50 shadow-xl shadow-indigo-500/20">
+                <img
+                  src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=400&auto=format&fit=crop&q=80"
+                  alt="Tanya - Your Personal AI Interviewer"
+                  className="h-full w-full object-cover object-top"
+                />
+              </div>
+              <span className="absolute -bottom-1.5 -right-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-[10px] font-bold text-emerald-300 backdrop-blur-sm">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Active
+              </span>
+            </div>
+
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                Meet Tanya
+              </h2>
+              <p className="mt-0.5 text-xs font-semibold uppercase tracking-wider text-indigo-400">
+                Your Personal AI Interviewer
+              </p>
+              <p className="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Practice real-world interviews, improve your answers, solve coding problems, and receive personalized feedback with Tanya.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <button
+              onClick={() => onStartInterview('technical', 'Senior Full-Stack Engineer', 'senior')}
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 hover:from-indigo-500 hover:to-indigo-400 transition"
+            >
+              <Sparkles className="h-4 w-4" />
+              Interview with Tanya
+            </button>
+            <button
+              onClick={() => onStartInterview('dsa', 'Algorithms & Problem Solving', 'mid')}
+              className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition"
+            >
+              <Code2 className="h-4 w-4" />
+              Coding Arena
             </button>
           </div>
         </div>

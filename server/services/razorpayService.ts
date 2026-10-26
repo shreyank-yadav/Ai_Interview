@@ -7,9 +7,28 @@ import crypto from 'crypto';
 import { dbStore } from '../db/store.ts';
 import { PaymentOrder, SubscriptionTier } from '../db/schema.ts';
 
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_TanyaAITestKey123';
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'tanya_rzp_test_secret_998877';
-const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || 'tanya_webhook_sec_112233';
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Retrieve Razorpay credentials safely
+export function getRazorpayCredentials(): { keyId: string; keySecret: string } {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+  if (isProduction) {
+    if (!keyId || !keySecret || keyId.includes('YourTestKeyIdHere') || keySecret.includes('YourTestKeySecretHere')) {
+      throw new Error(
+        'CRITICAL CONFIGURATION ERROR: RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET must be configured with valid credentials in production.'
+      );
+    }
+    return { keyId: keyId.trim(), keySecret: keySecret.trim() };
+  }
+
+  // Development defaults
+  return {
+    keyId: (keyId && !keyId.includes('YourTestKeyIdHere')) ? keyId.trim() : 'rzp_test_TanyaAITestKey123',
+    keySecret: (keySecret && !keySecret.includes('YourTestKeySecretHere')) ? keySecret.trim() : 'tanya_rzp_test_secret_998877',
+  };
+}
 
 export interface CreateOrderParams {
   userId: string;
@@ -19,8 +38,7 @@ export interface CreateOrderParams {
 
 /**
  * Creates a server-side Razorpay Order.
- * Interacts with the real Razorpay API if live test credentials are configured,
- * or generates an authentic test order schema backed by the local store.
+ * Issue 5 & 9: In production, requires real Razorpay credentials.
  */
 export async function createRazorpayOrder(params: CreateOrderParams): Promise<{
   orderId: string;
@@ -28,19 +46,15 @@ export async function createRazorpayOrder(params: CreateOrderParams): Promise<{
   currency: string;
   keyId: string;
 }> {
+  const { keyId, keySecret } = getRazorpayCredentials();
   const amountInPaise = Math.round(params.amountInINR * 100);
   const receipt = `rcpt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   let razorpayOrderId = `order_${Math.random().toString(36).substring(2, 10)}${Date.now().toString().slice(-4)}`;
 
-  // If valid credentials without placeholder are present, attempt live Razorpay API call
-  if (
-    process.env.RAZORPAY_KEY_ID &&
-    !process.env.RAZORPAY_KEY_ID.includes('YourTestKeyIdHere') &&
-    process.env.RAZORPAY_KEY_SECRET &&
-    !process.env.RAZORPAY_KEY_SECRET.includes('YourTestKeySecretHere')
-  ) {
+  // Attempt live Razorpay API order creation
+  if (keyId && keySecret && !keyId.startsWith('rzp_test_TanyaAITestKey123')) {
     try {
-      const auth = Buffer.from(`${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`).toString('base64');
+      const auth = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
       const res = await fetch('https://api.razorpay.com/v1/orders', {
         method: 'POST',
         headers: {
@@ -62,14 +76,21 @@ export async function createRazorpayOrder(params: CreateOrderParams): Promise<{
         const data = await res.json();
         razorpayOrderId = data.id;
       } else {
-        console.warn('[Razorpay API] Live order call returned status:', res.status, 'Falling back to managed test order');
+        const errorText = await res.text();
+        console.warn('[Razorpay API] Order creation returned HTTP', res.status, errorText);
+        if (isProduction) {
+          throw new Error(`Razorpay gateway order creation failed with status ${res.status}: ${errorText}`);
+        }
       }
-    } catch (err) {
-      console.warn('[Razorpay API] Could not contact api.razorpay.com, using local test order generator:', err);
+    } catch (err: any) {
+      console.warn('[Razorpay API] Live API call error:', err);
+      if (isProduction) {
+        throw new Error(`Razorpay order initiation failed in production: ${err.message}`);
+      }
     }
   }
 
-  // Store in database
+  // Store order record in database
   const orderRecord: PaymentOrder = {
     id: `pay_${Date.now()}`,
     orderId: razorpayOrderId,
@@ -87,13 +108,14 @@ export async function createRazorpayOrder(params: CreateOrderParams): Promise<{
     orderId: razorpayOrderId,
     amount: amountInPaise,
     currency: 'INR',
-    keyId: RAZORPAY_KEY_ID,
+    keyId,
   };
 }
 
 /**
  * Verify Razorpay payment signature server-side using HMAC SHA256.
  * Signature Formula: HMAC_SHA256(order_id + "|" + razorpay_payment_id, secret)
+ * Issue 5: No mock signature bypasses permitted.
  */
 export function verifyRazorpaySignature(params: {
   razorpayOrderId: string;
@@ -101,24 +123,19 @@ export function verifyRazorpaySignature(params: {
   razorpaySignature: string;
 }): { isValid: boolean; error?: string } {
   try {
+    const { keySecret } = getRazorpayCredentials();
     const text = `${params.razorpayOrderId}|${params.razorpayPaymentId}`;
     const generatedSignature = crypto
-      .createHmac('sha256', RAZORPAY_KEY_SECRET)
+      .createHmac('sha256', keySecret)
       .update(text)
       .digest('hex');
 
-    // Use timingSafeEqual to avoid timing attack vulnerabilities
     const generatedBuffer = Buffer.from(generatedSignature, 'utf-8');
     const providedBuffer = Buffer.from(params.razorpaySignature, 'utf-8');
 
     let isValid = false;
     if (generatedBuffer.length === providedBuffer.length) {
       isValid = crypto.timingSafeEqual(generatedBuffer, providedBuffer);
-    }
-
-    // Also support test mode simulation signature format for testing without live secrets
-    if (!isValid && params.razorpaySignature.startsWith('test_sig_verified_')) {
-      isValid = true;
     }
 
     return { isValid };
@@ -128,7 +145,8 @@ export function verifyRazorpaySignature(params: {
 }
 
 /**
- * Handle successful payment verification and upgrade user subscription
+ * Handle successful payment verification and upgrade user subscription.
+ * Issue 5: Subscriptions are strictly granted only upon verified HMAC SHA256 signature.
  */
 export function processSuccessfulPayment(params: {
   orderId: string;
@@ -137,7 +155,7 @@ export function processSuccessfulPayment(params: {
 }): { success: boolean; message: string; tier?: string } {
   const order = dbStore.getPaymentOrderByOrderId(params.orderId);
   if (!order) {
-    return { success: false, message: 'Payment order record not found in system' };
+    return { success: false, message: 'Payment order record not found in system.' };
   }
 
   // Check idempotency: If already marked paid, return success without duplicate action
@@ -145,7 +163,7 @@ export function processSuccessfulPayment(params: {
     return { success: true, message: 'Payment order already processed (idempotent)', tier: order.tier };
   }
 
-  // Verify signature
+  // Cryptographic Signature verification
   const verification = verifyRazorpaySignature({
     razorpayOrderId: params.orderId,
     razorpayPaymentId: params.paymentId,
@@ -154,10 +172,10 @@ export function processSuccessfulPayment(params: {
 
   if (!verification.isValid) {
     dbStore.updatePaymentOrder(params.orderId, { status: 'failed' });
-    return { success: false, message: 'Invalid payment signature. Payment rejected.' };
+    return { success: false, message: 'Invalid payment signature. Cryptographic verification failed.' };
   }
 
-  // Update payment order
+  // Update payment order to paid
   dbStore.updatePaymentOrder(params.orderId, {
     status: 'paid',
     razorpayPaymentId: params.paymentId,
@@ -187,9 +205,12 @@ export function processSuccessfulPayment(params: {
  */
 export function verifyRazorpayWebhook(rawBody: string, signatureHeader: string): boolean {
   if (!signatureHeader || !rawBody) return false;
+  const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET || (isProduction ? '' : 'tanya_webhook_sec_112233');
+  if (!webhookSecret) return false;
+
   try {
     const expected = crypto
-      .createHmac('sha256', RAZORPAY_WEBHOOK_SECRET)
+      .createHmac('sha256', webhookSecret)
       .update(rawBody)
       .digest('hex');
 

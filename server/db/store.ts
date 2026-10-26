@@ -53,7 +53,10 @@ class TanyaDatabaseStore {
           users: parsed.users?.length ? parsed.users : [...SEED_USERS],
           sessions: parsed.sessions?.length ? parsed.sessions : [SEED_COMPLETED_SESSION],
           reports: parsed.reports?.length ? parsed.reports : (SEED_COMPLETED_SESSION.report ? [SEED_COMPLETED_SESSION.report] : []),
-          resumes: parsed.resumes?.length ? parsed.resumes : [...SEED_RESUMES],
+          resumes: (parsed.resumes?.length ? parsed.resumes : [...SEED_RESUMES]).map((r: ParsedResume) => ({
+            ...r,
+            sourceType: r.sourceType || (r.storedFilePath ? 'file_upload' : 'pasted_text'),
+          })),
           problems: parsed.problems?.length ? parsed.problems : [...SEED_CODING_PROBLEMS],
           persona: parsed.persona ? parsed.persona : { ...DEFAULT_TANYA_PERSONA },
           payments: parsed.payments || [],
@@ -77,8 +80,8 @@ class TanyaDatabaseStore {
           id: 'log_seed_1',
           timestamp: new Date().toISOString(),
           action: 'SYSTEM_INIT',
-          actorEmail: 'system@tanya-ai.com',
-          details: 'Tanya AI Interviewer database initialized with seed records.',
+          actorEmail: 'system@prepnova.com',
+          details: 'PrepNova platform database initialized with seed records.',
         }
       ],
     };
